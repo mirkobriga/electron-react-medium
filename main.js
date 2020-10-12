@@ -1,6 +1,7 @@
 const { app, BrowserWindow } = require('electron')
+const electronreloader = require('electron-reloader')
 
-function createWindow () {
+function createWindow() {
   // Crea la finestra del browser
   const win = new BrowserWindow({
     width: 800,
@@ -10,21 +11,19 @@ function createWindow () {
     }
   })
 
-  // and load the index.html of the app.
-  win.loadFile('index.html')
+  // carica il file index.html
+  win.loadFile('dist/index.html')
 
   // Apre il Pannello degli Strumenti di Sviluppo.
   win.webContents.openDevTools()
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
+// Quando electron è pronto creiamo la finestra del browser
 // Alcune API possono essere utilizzate solo dopo che si verifica questo evento.
 app.whenReady().then(createWindow)
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
+// Tranne per MacOS terminiamo l'applicazione se tutte le finestre ad essa collegate vengono chiuse
+// Su MacOS è uso comune che l'utente chiuda le applicazioni usando Cmd + Q
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
@@ -32,9 +31,15 @@ app.on('window-all-closed', () => {
 })
 
 app.on('activate', () => {
-  // On macOS it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
+  // Su macOS ricrea la finestra quando l'utente clicca sull'icona al'interno della dock
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow()
   }
 })
+
+if (process.env.NODE_ENV === 'development') {
+  console.log('start relaoder')
+  electronreloader(module, {
+    ignore: './src'
+  })
+}
